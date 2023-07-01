@@ -44,6 +44,22 @@ jobs:
     if: github.event.name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - run: rsync -v -e 'ssh -i ~/.ssh/0317.pem' dist/index.js ec2-user@35.78.115.211:~/index.js
-      - run: ssh -i ~/.ssh/0317.pem ec2-user@35.78.115.211 sudo systemctl restart backend       
-      - run: ssh -i ~/.ssh/0317.pem ec2-user@35.78.115.211 sudo systemctl status backend        
+      - uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.BACKEND_SERVER_SSH_KEY }}
+          known_hosts: ${{ secrets.BACKEND_SERVER_KNOWN_HOST }}
+
+      - run: rsync -v dist/index.js ${{BACKEND_SERVER_USER}}@${{BACKEND_SERVER_IP}}:~/index.js
+        env: 
+          BACKEND_SERVER_IP: ${{secrets.BACKEND_SERVER_IP}}
+          BACKEND_SERVER_USER: ${{secrets.BACKEND_SERVER_USER}}
+
+      - run: ssh ${{BACKEND_SERVER_USER}}@${{BACKEND_SERVER_IP}} sudo systemctl restart backend       
+        env: 
+          BACKEND_SERVER_IP: ${{secrets.BACKEND_SERVER_IP}}
+          BACKEND_SERVER_USER: ${{secrets.BACKEND_SERVER_USER}}
+
+      - run: ssh ${{BACKEND_SERVER_USER}}@${{BACKEND_SERVER_IP}} sudo systemctl status backend
+        env: 
+          BACKEND_SERVER_IP: ${{secrets.BACKEND_SERVER_IP}}
+          BACKEND_SERVER_USER: ${{secrets.BACKEND_SERVER_USER}}
