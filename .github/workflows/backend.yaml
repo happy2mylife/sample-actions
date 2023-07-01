@@ -22,7 +22,11 @@ jobs:
       - run: npm test -- --coverage
       - run: npm run build
 
+      - run: node dist/index.html &
+      - run: npm run test:api
+
       - uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: coverage
           path: backend/coverage/**

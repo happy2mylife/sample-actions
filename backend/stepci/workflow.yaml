@@ -1,0 +1,21 @@
+version: "1.1"
+
+name: sum api
+
+env:
+  baseUrl: http://localhost:8080
+
+tests:
+  sum:
+    steps:
+      - name: Sum Request
+        http:
+          url: ${{env.baseUrl}}/api/sum
+          method: GET
+          params:
+            input1: 1
+            input2: 2
+          check:
+            status: 200
+            jsonpath:
+              $.sum: 3
