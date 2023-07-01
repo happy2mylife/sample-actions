@@ -37,4 +37,13 @@ jobs:
         with:
           name: dist
           path: backend/dist/**
-          retention-days: 5          
+          retention-days: 5
+
+  deploy:
+    needs: build
+    if: github.event.name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - run: rsync -v -e 'ssh -i ~/.ssh/0317.pem' dist/index.js ec2-user@35.78.115.211:~/index.js
+      - run: ssh -i ~/.ssh/0317.pem ec2-user@35.78.115.211 sudo systemctl restart backend       
+      - run: ssh -i ~/.ssh/0317.pem ec2-user@35.78.115.211 sudo systemctl status backend        
